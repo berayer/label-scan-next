@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Stock {
+  id           Int        @id @default(autoincrement())
+  title        String
+  table_header String?
+  creator      String     @default("unknown")
+  create_at    DateTime   @default(now())
+  stockRows    StockRow[]
+}
+
+model StockRow {
+  id         Int      @id @default(autoincrement())
+  stock      Stock    @relation(fields: [stockId], references: [id])
+  stockId    Int
+  row_key    String
+  row_data   String
+  scan_state Boolean  @default(false)
+  scan_user  String   @default("unknown")
+  scan_time  DateTime @default(now())
+}
