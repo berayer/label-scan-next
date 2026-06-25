@@ -1,0 +1,21 @@
+# 忽略依赖库（最关键）
+node_modules
+npm-debug.log
+
+# 忽略本地构建产物和缓存
+.next
+out
+dist
+build
+
+# 忽略版本控制和 IDE 配置
+.git
+.gitignore
+.editorconfig
+.vscode
+.idea
+
+# 忽略日志和大文件
+*.log
+*.zip
+*.tar.gz

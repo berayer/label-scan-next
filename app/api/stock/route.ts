@@ -33,12 +33,43 @@ export async function GET() {
 }
 
 export async function POST(r: NextRequest) {
-  const { title } = await r.json()
-  if (!title) return NextResponse.json({ code: -1, message: '参数错误' })
-  await prisma.stock.create({
+  const { idx, name, data } = (await r.json()) as {
+    idx: number
+    name: string
+    data: string[][]
+  }
+  if (!idx) return NextResponse.json({ code: -1, message: '参数错误' })
+
+  const header = data[0]
+
+  const stock = await prisma.stock.create({
     data: {
-      title
+      title: name,
+      table_header: JSON.stringify(header)
     }
   })
+
+  const batchData = data.slice(1).map((d) => ({
+    stockId: stock.id,
+    row_key: d[idx],
+    row_data: JSON.stringify(d)
+  }))
+
+  // 批量插入明细
+  await prisma.stockRow.createMany({
+    data: batchData
+  })
+
+  return NextResponse.json({ code: 1 })
+}
+
+export async function DELETE(r: NextRequest) {
+  const { id } = (await r.json()) as {
+    id: number
+  }
+  if (id) {
+    await prisma.stockRow.deleteMany({ where: { stockId: id } })
+    await prisma.stock.deleteMany({ where: { id: id } })
+  }
   return NextResponse.json({ code: 1 })
 }
